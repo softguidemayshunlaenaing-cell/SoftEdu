@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,14 +6,40 @@
     <meta charset="UTF-8">
     <title>SoftEdu | Excellence in Education</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --bg-gray: #f8f9fa;
+            /* Light gray background */
+            --navbar-bg: lightgray;
+            /* Light gray navbar */
+        }
+
+        body {
+            background-color: var(--bg-gray);
+        }
+
+        /* Landing Page Navbar */
+        .navbar {
+            background-color: var(--navbar-bg) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--primary-green) 0%, #10b981 100%);
+        }
+
+        .btn-emerald {
+            background-color: var(--primary-green);
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,47 +52,9 @@
         </div>
     <?php endif; ?>
 
-    <nav class="navbar navbar-expand-lg fixed-top shadow-sm py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="#">
-                <span style="color: var(--primary-green);">SOFT</span><span class="text-dark">EDU</span>
-            </a>
+    <?php include 'includes/navbar.php'; ?>
 
-            <button class="navbar-toggler border-0 shadow-none" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link px-3 fw-medium text-dark" href="#home">Home</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link px-3 fw-medium text-dark dropdown-toggle" href="#programs"
-                            data-bs-toggle="dropdown">Programs</a>
-                        <ul class="dropdown-menu border-0 shadow-lg rounded-4 p-2 mt-2">
-                            <li><a class="dropdown-item rounded-3 py-2" href="#computer-science">Computer Science</a>
-                            </li>
-                            <li><a class="dropdown-item rounded-3 py-2" href="#business-management">Business
-                                    Management</a></li>
-                            <li><a class="dropdown-item rounded-3 py-2" href="#graphic-design">Graphic Design</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link px-3 fw-medium text-dark" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link px-3 fw-medium text-dark" href="#contact">Contact</a></li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-2">
-                    <a href="#" class="btn btn-link text-decoration-none fw-bold text-dark px-4" data-bs-toggle="modal"
-                        data-bs-target="#loginModal">Sign In</a>
-                    <a href="#" class="btn btn-emerald px-4 shadow-sm" data-bs-toggle="modal"
-                        data-bs-target="#applyModal">Apply Now</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <section class="hero-gradient text-white">
+    <section id="home" class="hero-gradient text-white">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-7 text-center text-lg-start">
@@ -108,7 +97,7 @@
         </div>
     </section>
 
-    <section class="py-5">
+    <section id="learning-path" class="py-5">
         <div class="container pt-5">
             <div class="row g-4 justify-content-center">
                 <div class="col-md-4">
@@ -136,10 +125,56 @@
         </div>
     </section>
 
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Get in Touch</h2>
+                <p class="text-muted">Have questions? We'd love to hear from you.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <form action="backend/contact_submit.php" method="POST" class="p-4 shadow rounded-4 bg-white">
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-medium">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Your Name"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-medium">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="you@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label fw-medium">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label fw-medium">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5"
+                                placeholder="Write your message..." required></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-emerald fw-bold py-3 rounded-pill">Send
+                                Message</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-6 d-flex flex-column">
+                    <div class="shadow rounded-4 overflow-hidden mb-3" style="min-height:450px;">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3819.123456789!2d96.13000!3d16.82xxxx!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30c1xxxxxxxxxxxx%3A0xyyyyyyyyyyyyy!2s575B%20Pyay%20Rd%2C%20Yangon%2C%20Myanmar!5e0!3m2!1sen!2smm!4vXXXXXXXXXXXXXX"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-dark text-white py-5 mt-5">
         <div class="container text-center">
             <div class="mb-4">
-                <a class="navbar-brand fw-bold fs-3" href="#">
+                <a class="navbar-brand fw-bold fs-3" href="index.php">
                     <span style="color: var(--primary-green);">SOFT</span><span class="text-white">EDU</span>
                 </a>
             </div>

@@ -19,6 +19,9 @@ if (!$user) {
     exit;
 }
 
+// Preserve welcome flag for students
+$showWelcome = $_SESSION['show_welcome'] ?? false;
+
 // Set session variables
 $_SESSION['user_name'] = $user['name'];
 $_SESSION['user_email'] = $user['email'];
@@ -26,10 +29,23 @@ $_SESSION['user_role'] = $user['role'];
 $_SESSION['user_profile_image'] = $user['profile_image'] ?? '';
 
 // Route based on role
-if ($user['role'] === 'admin' || $user['role'] === 'staff') {
-    include 'admin_dashboard.php';
-} else {
-    // Student
-    include 'student_dashboard.php'; // ✅ Changed from courses.php
+switch ($user['role']) {
+    case 'admin':
+        include 'admin_dashboard.php';
+        break;
+    case 'staff':
+        include 'staff_dashboard.php';
+        break;
+    case 'student':
+        // Preserve welcome flag for student dashboard
+        if ($showWelcome) {
+            $_SESSION['show_welcome'] = true;
+        }
+        include 'student_dashboard.php';
+        break;
+    default:
+        session_destroy();
+        header('Location: index.php');
+        exit;
 }
 ?>

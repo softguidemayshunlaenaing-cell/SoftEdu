@@ -153,15 +153,16 @@ if (!$user) {
 </head>
 
 <body>
-    <div class="container py-4 py-md-5">
+    <?php include 'includes/navbar.php'; ?>
+    <div class="container py-4 py-md-5 mt-5">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-xl-7">
 
-                <div class="mb-3 d-flex align-items-center">
+                <!-- <div class="mb-3 d-flex align-items-center">
                     <a href="dashboard.php" class="text-decoration-none text-muted small fw-bold">
                         <i class="fa-solid fa-chevron-left me-1"></i> BACK TO DASHBOARD
                     </a>
-                </div>
+                </div> -->
 
                 <div class="card">
                     <div class="header-gradient"></div>

@@ -48,6 +48,7 @@ if ($user['role'] === 'student' && (int) $user['force_password_change'] === 1) {
     $_SESSION['user_name'] = $user['name'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_role'] = $user['role'];
+    $_SESSION['show_welcome'] = true; // ✅ SET WELCOME FLAG
 
     echo json_encode([
         'success' => true,
@@ -62,8 +63,10 @@ $_SESSION['user_name'] = $user['name'];
 $_SESSION['user_email'] = $user['email'];
 $_SESSION['user_role'] = $user['role'];
 $_SESSION['user_profile_image'] = $user['profile_image'] ?? '';
+$_SESSION['show_welcome'] = true; // ✅ SET WELCOME FLAG
 
 echo json_encode([
     'success' => true,
     'redirect' => 'dashboard.php'
 ]);
+?>

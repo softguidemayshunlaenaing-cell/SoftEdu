@@ -6,7 +6,7 @@ use PHPMailer\PHPMailer\Exception;
 
 // Make sure you include PHPMailer via Composer or manually
 require '../../vendor/autoload.php';
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'admin' && $_SESSION['user_role'] !== 'staff')) {
     http_response_code(403);
     exit;
 }
