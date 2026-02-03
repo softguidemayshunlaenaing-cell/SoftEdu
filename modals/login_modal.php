@@ -1,6 +1,6 @@
 <!-- LOGIN MODAL -->
 <div class="modal fade" id="loginModal" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-md modal-tall">
         <div class="modal-content border-0 rounded-4 p-4">
             <div class="text-center mb-3">
                 <h5 class="fw-semibold">Login to SoftEdu</h5>

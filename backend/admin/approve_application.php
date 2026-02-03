@@ -141,6 +141,49 @@ try {
 
     } else {
         // Reject
+        $toEmail = $app['email'];
+
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'softguide.mayshunlaenaing@gmail.com';
+        $mail->Password = 'odvb zdbx jidl epfa'; // Gmail App Password
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
+
+        // Optional: local SSL bypass
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            ]
+        ];
+
+        $mail->setFrom('softguide.mayshunlaenaing@gmail.com', 'SoftGuide');
+        $mail->addAddress($toEmail, $toName);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Application Update - SoftGuide';
+        $mail->Body = "
+            <html>
+                <body>
+                    <p>Dear <b>{$toName}</b>,</p>
+                    <p>Thank you for applying to SoftGuide. After careful review, we regret to inform you that your application was <b>not approved</b> at this time.</p>
+                    <p>We appreciate your interest and encourage you to apply again in the future.</p>
+                    <br>
+                    <p>Best regards,<br>SoftGuide Team</p>
+                </body>
+            </html>
+        ";
+        $mail->AltBody = "Dear {$toName},\n\n"
+            . "Thank you for applying to SoftGuide. After careful review, we regret to inform you that your application was not approved at this time.\n\n"
+            . "We appreciate your interest and encourage you to apply again in the future.\n\n"
+            . "Best regards,\nSoftGuide Team";
+
+        $mail->send();
+
         $stmt = $db->prepare("UPDATE softedu_applications SET status = 'rejected' WHERE id = ?");
         $stmt->execute([$id]);
 
@@ -148,7 +191,7 @@ try {
 
         echo json_encode([
             'success' => true,
-            'message' => 'Application rejected successfully.'
+            'message' => 'Application rejected and email sent successfully.'
         ]);
     }
 

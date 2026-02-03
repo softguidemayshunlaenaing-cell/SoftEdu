@@ -12,7 +12,8 @@
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-3">
-                                <label for="courseTitle" class="form-label">Course Title *</label>
+                                <label for="courseTitle" class="form-label">Course Title <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="courseTitle" name="title" required>
                             </div>
                             <div class="mb-3">
@@ -56,7 +57,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-softedu">Save Course</button>
+                    <button type="submit" class="btn btn-success">Save Course</button>
                 </div>
             </form>
         </div>

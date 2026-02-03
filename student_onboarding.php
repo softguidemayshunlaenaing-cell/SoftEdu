@@ -196,7 +196,7 @@ if (!$needPassword && !$needDocuments) {
                         <label class="form-label">New Password</label>
                         <input type="password" id="new_password" name="new_password" class="form-control" required>
                         <span class="toggle-password" style="position:absolute; right:10px; top:38px; cursor:pointer;">
-                            👁️
+                            🙉
                         </span>
                     </div>
 
@@ -204,7 +204,7 @@ if (!$needPassword && !$needDocuments) {
                         <label class="form-label">Confirm New Password</label>
                         <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
                         <span class="toggle-password" style="position:absolute; right:10px; top:38px; cursor:pointer;">
-                            👁️
+                            🙉
                         </span>
                     </div>
 
@@ -279,10 +279,10 @@ if (!$needPassword && !$needDocuments) {
                 const input = this.previousElementSibling;
                 if (input.type === 'password') {
                     input.type = 'text';
-                    this.textContent = '🙈'; // change icon
+                    this.innerHTML = '🙉';
                 } else {
                     input.type = 'password';
-                    this.textContent = '👁️';
+                    this.innerHTML = '🙈';
                 }
             });
         });

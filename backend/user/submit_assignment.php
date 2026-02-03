@@ -1,94 +1,148 @@
 <?php
 session_start();
+require '../config/db.php';
+
 header('Content-Type: application/json');
 
-// Only students can submit assignments
+// 1️⃣ Check student authentication
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized.']);
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
 
-require_once '../config/db.php';
-$database = new Database();
-$db = $database->getConnection();
+$db = (new Database())->getConnection();
 
-$assignment_id = (int) ($_POST['assignment_id'] ?? 0);
-$student_id = (int) $_SESSION['user_id'];
+$assignmentId = (int) ($_POST['assignment_id'] ?? 0);
+$studentId = $_SESSION['user_id'];
 
-if (!$assignment_id || !$student_id) {
-    echo json_encode(['success' => false, 'message' => 'Invalid request.']);
+// 2️⃣ Fetch assignment info
+$stmt = $db->prepare("
+    SELECT title, due_date, late_days, late_penalty
+    FROM softedu_assignments
+    WHERE id = ?
+");
+$stmt->execute([$assignmentId]);
+$assignment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$assignment) {
+    echo json_encode(['success' => false, 'message' => 'Assignment not found']);
     exit;
 }
 
-// Validate file upload
-if (!isset($_FILES['solution_file']) || $_FILES['solution_file']['error'] !== UPLOAD_ERR_OK) {
-    echo json_encode(['success' => false, 'message' => 'Please upload a valid file.']);
-    exit;
-}
+$deadline = strtotime($assignment['due_date']);
+$lateDays = (int) $assignment['late_days'];
+$penaltyPerDay = (int) $assignment['late_penalty'];
+$now = time();
+$isLate = false;
+$daysLate = 0;
+$appliedPenalty = 0;
 
-$file = $_FILES['solution_file'];
-
-// Allowed MIME types for PDF and DOC/DOCX
-$allowedTypes = [
-    // Documents
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-
-    // Code files
-    'text/x-php',           // .php
-    'application/x-httpd-php',
-
-    // Archives
-    'application/zip',      // .zip
-    'application/x-zip-compressed'
-];
-if (!in_array($file['type'], $allowedTypes)) {
-    echo json_encode(['success' => false, 'message' => 'Only PDF or DOC/DOCX files are allowed.']);
-    exit;
-}
-
-// Max file size: 10MB
-if ($file['size'] > 10 * 1024 * 1024) {
-    echo json_encode(['success' => false, 'message' => 'File must be under 10MB.']);
-    exit;
-}
-
-// Create upload directory if missing
-$uploadDir = __DIR__ . '/../../uploads/assignments/';
-if (!is_dir($uploadDir)) {
-    if (!mkdir($uploadDir, 0755, true)) {
-        echo json_encode(['success' => false, 'message' => 'Failed to create upload directory.']);
+// 3️⃣ Check deadline rules
+if ($now > $deadline) {
+    if ($lateDays <= 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Deadline passed. Submission closed.'
+        ]);
         exit;
     }
+
+    $lateDeadline = strtotime("+{$lateDays} days", $deadline);
+
+    if ($now > $lateDeadline) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Late submission window closed.'
+        ]);
+        exit;
+    }
+
+    $isLate = true;
+    $daysLate = ceil(($now - $deadline) / 86400);
+    $appliedPenalty = min($daysLate * $penaltyPerDay, 100); // max 100%
 }
 
-// Generate unique filename
-$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-$filename = 'assign_' . $assignment_id . '_student_' . $student_id . '_' . time() . '.' . $ext;
-$targetPath = $uploadDir . $filename;
+// 4️⃣ Check existing submission
+$stmt = $db->prepare("
+    SELECT id, file_path
+    FROM softedu_assignment_submissions
+    WHERE assignment_id = ? AND student_id = ?
+");
+$stmt->execute([$assignmentId, $studentId]);
+$existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Save file
-if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-    echo json_encode(['success' => false, 'message' => 'Failed to save file.']);
+// 5️⃣ Validate uploaded file
+if (!isset($_FILES['solution_file']) || $_FILES['solution_file']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'message' => 'Invalid file upload']);
     exit;
 }
 
-try {
-    // Insert or update submission (allows re-submission)
-    $stmt = $db->prepare("
-        INSERT INTO softedu_assignment_submissions (assignment_id, student_id, file_path, submitted_at)
-        VALUES (?, ?, ?, NOW())
-        ON DUPLICATE KEY UPDATE 
-            file_path = VALUES(file_path),
-            submitted_at = VALUES(submitted_at)
-    ");
-    $stmt->execute([$assignment_id, $student_id, $filename]);
+// Allowed extensions
+$allowedExtensions = ['pdf', 'doc', 'docx', 'zip', 'php', 'js', 'css'];
+$ext = strtolower(pathinfo($_FILES['solution_file']['name'], PATHINFO_EXTENSION));
 
-    echo json_encode(['success' => true, 'message' => 'Assignment submitted successfully!']);
-
-} catch (Exception $e) {
-    error_log("Assignment submission error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Database error. Please try again.']);
+if (!in_array($ext, $allowedExtensions)) {
+    echo json_encode(['success' => false, 'message' => 'File type not allowed']);
+    exit;
 }
-?>
+
+// Optional: generate a safe random filename
+$newFileName = "assign_{$assignmentId}_student_{$studentId}_" . time() . "." . $ext;
+
+$uploadDir = __DIR__ . '/../../uploads/assignments/';
+if (!is_dir($uploadDir))
+    mkdir($uploadDir, 0777, true);
+
+$filePath = $uploadDir . $newFileName;
+
+// Move uploaded file
+if (!move_uploaded_file($_FILES['solution_file']['tmp_name'], $filePath)) {
+    echo json_encode(['success' => false, 'message' => 'File upload failed']);
+    exit;
+}
+
+// Make sure .php, .js, .css are not executable
+if (in_array($ext, ['php', 'js', 'css'])) {
+    chmod($filePath, 0644); // readable but not executable
+}
+
+// 7️⃣ Insert or update submission
+$relativePath = 'uploads/assignments/' . $newFileName;
+
+
+if ($existing) {
+    // Remove old file
+    if (!empty($existing['file_path']) && file_exists(__DIR__ . '/../../' . $existing['file_path'])) {
+        unlink(__DIR__ . '/../../' . $existing['file_path']);
+    }
+
+    // Update record
+    $stmt = $db->prepare("
+        UPDATE softedu_assignment_submissions
+        SET file_path = ?, submitted_at = NOW(), is_late = ?, penalty = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$relativePath, $isLate ? 1 : 0, $appliedPenalty, $existing['id']]);
+} else {
+    // Insert new record
+    $stmt = $db->prepare("
+        INSERT INTO softedu_assignment_submissions
+        (assignment_id, student_id, file_path, submitted_at, is_late, penalty)
+        VALUES (?, ?, ?, NOW(), ?, ?)
+    ");
+    $stmt->execute([$assignmentId, $studentId, $relativePath, $isLate ? 1 : 0, $appliedPenalty]);
+}
+
+// 8️⃣ Response
+$message = $isLate
+    ? "Late submission successful. Penalty applied: {$appliedPenalty}%."
+    : "Assignment submitted successfully!";
+
+echo json_encode([
+    'success' => true,
+    'late' => $isLate,
+    'days_late' => $daysLate,
+    'penalty' => $appliedPenalty,
+    'message' => $message
+]);

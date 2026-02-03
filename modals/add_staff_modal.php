@@ -9,15 +9,16 @@
             <form id="addStaffForm">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Full Name *</label>
+
+                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email *</label>
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
                         <input type="email" name="email" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Password *</label>
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
                         <input type="password" name="password" class="form-control" minlength="8" required>
                     </div>
                     <div class="mb-3">
@@ -28,7 +29,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-softedu">Add Staff</button>
+                    <button type="submit" class="btn btn-success">Add Staff</button>
                 </div>
             </form>
         </div>

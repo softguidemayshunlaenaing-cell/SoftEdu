@@ -1,0 +1,13 @@
+# Allow access to .php, .js, .css, .pdf, .doc, .docx, .zip
+<FilesMatch "\.(php|js|css|pdf|doc|docx|zip)$">
+    Require all granted
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
+
+# Optional: Force download for safety
+<FilesMatch "\.(php|js|css)$">
+    ForceType application/octet-stream
+    Header set Content-Disposition attachment
+</FilesMatch>

@@ -6,11 +6,13 @@
                 <h5 class="modal-title">Add New Course Material</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="addMaterialForm">
+            <form id="addMaterialForm" method="post">
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="addMaterialCourse" class="form-label">Course *</label>
+
+                            <label for="addMaterialCourse" class="form-label">Course <span
+                                    class="text-danger">*</span></label>
                             <select name="course_id" id="addMaterialCourse" class="form-select" required>
                                 <option value="">Select a course</option>
                                 <?php
@@ -22,19 +24,24 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="addMaterialTitle" class="form-label">Title *</label>
+
+                            <label for="addMaterialTitle" class="form-label">Title <span
+                                    class="text-danger">*</span></label>
                             <input type="text" name="title" id="addMaterialTitle" class="form-control"
                                 placeholder="e.g., Week 1 Lecture" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="addMaterialType" class="form-label">Type *</label>
+                            <label for="addMaterialType" class="form-label">Type <span
+                                    class="text-danger">*</span></label>
                             <select name="material_type" id="addMaterialType" class="form-select" required>
                                 <option value="video">Video</option>
                                 <option value="pdf">PDF</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="addMaterialSource" class="form-label">Source *</label>
+
+                            <label for="addMaterialSource" class="form-label">Source <span
+                                    class="text-danger">*</span></label>
                             <select name="source" id="addMaterialSource" class="form-select" required>
                                 <option value="youtube">YouTube</option>
                                 <option value="google_drive">Google Drive</option>
@@ -49,7 +56,9 @@
                             </select>
                         </div>
                         <div class="col-12">
-                            <label for="addMaterialUrl" class="form-label">URL *</label>
+
+                            <label for="addMaterialUrl" class="form-label">URL <span
+                                    class="text-danger">*</span></label>
                             <input type="url" name="material_url" id="addMaterialUrl" class="form-control"
                                 placeholder="https://..." required>
                             <div class="form-text">
@@ -62,7 +71,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-softedu">Add Material</button>
+                    <button type="submit" class="btn btn-success">Add Material</button>
                 </div>
             </form>
         </div>

@@ -14,6 +14,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-success" id="confirmApproveBtn">Approve</button>
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
             </div>
         </div>
     </div>

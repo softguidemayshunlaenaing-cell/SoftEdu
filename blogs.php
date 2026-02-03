@@ -6,46 +6,26 @@ session_start();
 
 <head>
     <meta charset="UTF-8">
-    <title>Blogs – SoftEdu</title>
+    <title>SoftEdu | Excellence in Education</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
-
-    <!-- Bootstrap & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Theme -->
     <link rel="stylesheet" href="assets/css/style.css">
+
 </head>
 
-<body class="bg-light">
+<body>
 
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="index.php">
-                <span style="color: var(--primary-green);">SOFT</span><span class="text-dark">EDU</span>
-            </a>
-
-            <a href="index.php" class="btn btn-outline-secondary btn-sm">
-                Back to Home
-            </a>
-        </div>
-    </nav>
-
+    <?php include 'includes/navbar.php'; ?>
     <!-- HEADER -->
     <section class="hero-gradient text-white py-5">
         <div class="container text-center">
-            <h1 class="fw-bold" style="font-family: 'Playfair Display', serif;">
-                SoftEdu Blogs
-            </h1>
-            <p class="opacity-90 mt-3 fs-5">
-                Insights, ideas & practical knowledge for modern learners
-            </p>
+            <h1 class="fw-bold" style="font-family: 'Playfair Display', serif;">SoftEdu Blogs</h1>
+            <p class="opacity-90 mt-3 fs-5">Insights, ideas & practical knowledge for modern learners</p>
         </div>
     </section>
 
@@ -55,6 +35,118 @@ session_start();
 
             <div class="row g-4">
 
+                <!-- Blog Card -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm rounded-4 h-100">
+                        <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2"
+                            class="card-img-top rounded-top-4" alt="Blog image">
+
+                        <div class="card-body">
+                            <span class="badge bg-success-subtle text-success mb-2">
+                                Technology
+                            </span>
+
+                            <h5 class="fw-bold mt-2">
+                                Why Web Development Skills Matter in 2026
+                            </h5>
+
+                            <p class="text-muted small">
+                                Learn why HTML, CSS, JavaScript, and backend skills are essential
+                                for IT careers today.
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="blog_detail.php?id=1" class="btn btn-emerald btn-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Blog Card -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm rounded-4 h-100">
+                        <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2"
+                            class="card-img-top rounded-top-4" alt="Blog image">
+
+                        <div class="card-body">
+                            <span class="badge bg-success-subtle text-success mb-2">
+                                Technology
+                            </span>
+
+                            <h5 class="fw-bold mt-2">
+                                Why Web Development Skills Matter in 2026
+                            </h5>
+
+                            <p class="text-muted small">
+                                Learn why HTML, CSS, JavaScript, and backend skills are essential
+                                for IT careers today.
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="blog_detail.php?id=1" class="btn btn-emerald btn-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Blog Card -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm rounded-4 h-100">
+                        <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2"
+                            class="card-img-top rounded-top-4" alt="Blog image">
+
+                        <div class="card-body">
+                            <span class="badge bg-success-subtle text-success mb-2">
+                                Technology
+                            </span>
+
+                            <h5 class="fw-bold mt-2">
+                                Why Web Development Skills Matter in 2026
+                            </h5>
+
+                            <p class="text-muted small">
+                                Learn why HTML, CSS, JavaScript, and backend skills are essential
+                                for IT careers today.
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="blog_detail.php?id=1" class="btn btn-emerald btn-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Blog Card -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm rounded-4 h-100">
+                        <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2"
+                            class="card-img-top rounded-top-4" alt="Blog image">
+
+                        <div class="card-body">
+                            <span class="badge bg-success-subtle text-success mb-2">
+                                Technology
+                            </span>
+
+                            <h5 class="fw-bold mt-2">
+                                Why Web Development Skills Matter in 2026
+                            </h5>
+
+                            <p class="text-muted small">
+                                Learn why HTML, CSS, JavaScript, and backend skills are essential
+                                for IT careers today.
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="blog_detail.php?id=1" class="btn btn-emerald btn-sm">
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <!-- Blog Card -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card shadow-sm rounded-4 h-100">
@@ -147,9 +239,16 @@ session_start();
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-dark text-white text-center py-4">
-        <div class="container">
-            <small>© <?= date('Y') ?> SoftEdu. All Rights Reserved.</small>
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container text-center">
+            <div class="mb-4">
+                <a class="navbar-brand fw-bold fs-3" href="index.php">
+                    <span style="color: var(--primary-green);">SOFT</span><span class="text-white">EDU</span>
+                </a>
+            </div>
+            <p class="text-secondary small mb-0">
+                &copy; <?= date('Y') ?> SoftEdu International Academy. All Rights Reserved.
+            </p>
         </div>
     </footer>
 

@@ -99,22 +99,36 @@ if (!isset($user)) {
             font-weight: 600;
         }
 
-        /* ===== BUTTONS ===== */
-        .btn-green {
-            background-color: var(--primary-green);
-            color: white;
-            border-radius: 10px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border: none;
-            transition: transform 0.2s, background 0.2s;
-            cursor: pointer;
-        }
+        /* Green Buttons */
+.btn-green {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: transform 0.2s, background 0.2s;
+}
 
-        .btn-green:hover {
-            background-color: var(--primary-dark);
-            color: white;
-        }
+.btn-green:hover {
+    background-color: #047857; /* Darker green on hover */
+    transform: translateY(-1px);
+}
+
+/* Small Green Buttons */
+.btn-green-sm {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.btn-green-sm:hover {
+    background-color: #047857;
+}
 
         .btn-green:active {
             transform: scale(0.98);
@@ -158,6 +172,18 @@ if (!isset($user)) {
 
         .table-hover tbody tr:hover {
             background-color: var(--primary-light);
+        }
+        .pagination-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            min-height: 48px;
+        }
+        .table-fixed-rows {
+            min-height: 600px;
+        }
+        .empty-row td {
+            height: 48px;
         }
 
         /* PDF Preview */
@@ -230,12 +256,13 @@ if (!isset($user)) {
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 sidebar bg-light p-3">
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>"
-                            href="profile.php">
-                            <i class="fas fa-user me-2"></i>My Profile
+                   <li class="nav-item">
+                        <a class="nav-link <?= ($_GET['page'] ?? '') === 'profile' ? 'active' : '' ?>"
+                            href="?page=profile">
+                            <i class="fas fa-user-circle me-2"></i> My Profile
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link <?= (!isset($_GET['page']) || $_GET['page'] === 'applications') ? 'active' : '' ?>"
                             href="?page=applications">
@@ -308,7 +335,7 @@ if (!isset($user)) {
                         </div>
                     </form>
 
-                    <div class="table-responsive">
+                    <div class="table-responsive table-fixed-rows">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -336,10 +363,32 @@ if (!isset($user)) {
                                     $sql .= " AND DATE(created_at) <= ?";
                                     $params[] = $_GET['end_date'];
                                 }
-                                $sql .= " ORDER BY created_at ASC";
+                                $perPage = 10;
+                                $pageNum = max(1, (int) ($_GET['app_page'] ?? 1));
+                                $offset = ($pageNum - 1) * $perPage;
+
+                                $countSql = "SELECT COUNT(*) FROM softedu_applications WHERE 1=1";
+                                $countParams = $params;
+                                if (!empty($_GET['status'])) {
+                                    $countSql .= " AND status = ?";
+                                }
+                                if (!empty($_GET['start_date'])) {
+                                    $countSql .= " AND DATE(created_at) >= ?";
+                                }
+                                if (!empty($_GET['end_date'])) {
+                                    $countSql .= " AND DATE(created_at) <= ?";
+                                }
+                                $countStmt = $db->prepare($countSql);
+                                $countStmt->execute($countParams);
+                                $totalRows = (int) $countStmt->fetchColumn();
+                                $totalPages = max(1, (int) ceil($totalRows / $perPage));
+
+                                $sql .= " ORDER BY created_at ASC LIMIT $perPage OFFSET $offset";
                                 $stmt = $db->prepare($sql);
                                 $stmt->execute($params);
+                                $rowCount = 0;
                                 while ($app = $stmt->fetch(PDO::FETCH_ASSOC)):
+                                    $rowCount++;
                                     ?>
                                     <tr>
                                         <td><?= htmlspecialchars($app['name']) ?></td>
@@ -364,9 +413,131 @@ if (!isset($user)) {
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
+                                <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
+                                    <tr class="empty-row">
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                <?php endfor; ?>
                             </tbody>
                         </table>
                     </div>
+                    <div class="pagination-wrap">
+                        <?php if ($totalPages > 1): ?>
+                            <nav aria-label="Applications pagination">
+                                <ul class="pagination">
+                                    <?php
+                                    $prevPage = max(1, $pageNum - 1);
+                                    $nextPage = min($totalPages, $pageNum + 1);
+                                    $baseParams = $_GET;
+                                    $baseParams['page'] = 'applications';
+                                    ?>
+                                    <li class="page-item <?= $pageNum <= 1 ? 'disabled' : '' ?>">
+                                        <a class="page-link"
+                                            href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['app_page' => $prevPage]))) ?>">
+                                            Previous
+                                        </a>
+                                    </li>
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?= $i === $pageNum ? 'active' : '' ?>">
+                                            <a class="page-link"
+                                                href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['app_page' => $i]))) ?>">
+                                                <?= $i ?>
+                                            </a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= $pageNum >= $totalPages ? 'disabled' : '' ?>">
+                                        <a class="page-link"
+                                            href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['app_page' => $nextPage]))) ?>">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
+                    </div>
+                        <?php elseif (($_GET['page'] ?? '') === 'profile'): ?>
+
+
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Profile Header -->
+                                <div class="text-center mb-4">
+                                    <?php
+                                    $imgSrc = !empty($user['profile_image'])
+                                        ? 'uploads/profiles/' . htmlspecialchars($user['profile_image'])
+                                        : 'https://ui-avatars.com/api/?name=    ' . urlencode($user['name']) . '&background=059669&color=fff&size=128';
+                                    ?>
+                                    <img src="<?= $imgSrc ?>" id="profilePreview" class="rounded-circle mb-3" width="120"
+                                        height="120" style="object-fit: cover; border: 3px solid #e2e8f0;">
+
+                                    <h4 class="mb-1"><?= htmlspecialchars($user['name']) ?></h4>
+                                    <span class="badge bg-success"><?= ucfirst($_SESSION['user_role']) ?></span>
+                                </div>
+
+                                <!-- Profile Tabs -->
+                                <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" data-bs-toggle="tab"
+                                            data-bs-target="#accountTab">Account</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" data-bs-toggle="tab"
+                                            data-bs-target="#securityTab">Security</button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <!-- Account Tab -->
+                                    <div class="tab-pane fade show active" id="accountTab">
+                                        <form id="nameForm">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-medium">Full Name</label>
+                                                <input type="text" class="form-control" name="name"
+                                                    value="<?= htmlspecialchars($user['name']) ?>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-medium">Email Address (Read Only)</label>
+                                                <input type="email" class="form-control bg-light"
+                                                    value="<?= htmlspecialchars($_SESSION['user_email']) ?>" disabled>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">Update Name</button>
+                                            <div id="nameAlert" class="alert d-none mt-3"></div>
+                                        </form>
+                                    </div>
+
+                                    <!-- Security Tab -->
+                                    <div class="tab-pane fade" id="securityTab">
+                                        <form id="passwordForm">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-medium">Current Password</label>
+                                                <input type="password" class="form-control" name="current_password"
+                                                    required>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-medium">New Password</label>
+                                                    <input type="password" class="form-control" name="new_password"
+                                                        minlength="8" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-medium">Confirm New Password</label>
+                                                    <input type="password" class="form-control" name="confirm_password"
+                                                        required>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">Change Password</button>
+                                            <div id="passwordAlert" class="alert d-none mt-3"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
 <?php elseif ($_GET['page'] === 'assignments'): ?>
     <h2 class="mb-4">Manage Assignments</h2>
     
@@ -415,7 +586,7 @@ if (!isset($user)) {
     
     <!-- Export & Reset -->
     <div class="col-md-6 d-flex align-items-end gap-2">
-        <button type="button" class="btn btn-softedu me-2" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
+        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
             <i class="fas fa-plus me-1"></i> Add New Assignment
         </button>
         
@@ -542,7 +713,7 @@ if (!isset($user)) {
                     <p><strong>Course:</strong> <?= htmlspecialchars($assignment['course_title']) ?></p>
                     <p><strong>Due Date:</strong> <?= date('M j, Y', strtotime($assignment['due_date'])) ?></p>
                     <a href="?page=assignments" class="btn btn-secondary mb-3">← Back to Assignments</a>
-                    <div class="table-responsive">
+                    <div class="table-responsive table-fixed-rows">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -568,7 +739,7 @@ if (!isset($user)) {
                                         <td><?= htmlspecialchars($sub['student_name']) ?><br><small><?= htmlspecialchars($sub['email']) ?></small>
                                         </td>
                                         <td>
-                                            <a href="uploads/assignments/<?= htmlspecialchars($sub['file_path']) ?>"
+                                            <a href="<?= htmlspecialchars($sub['file_path']) ?>"
                                                 target="_blank" class="btn btn-sm btn-outline-primary">View File</a>
                                         </td>
                                         <td><?= date('M j, Y g:i A', strtotime($sub['submitted_at'])) ?></td>
@@ -585,10 +756,10 @@ if (!isset($user)) {
                 <?php elseif ($_GET['page'] === 'courses'): ?>
                     <!-- Courses Management -->
                     <h2 class="mb-4">Manage Courses</h2>
-                    <button class="btn btn-softedu mb-3" data-bs-toggle="modal" data-bs-target="#courseModal">
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#courseModal">
                         <i class="fas fa-plus me-1"></i> Add New Course
                     </button>
-                    <div class="table-responsive">
+                    <div class="table-responsive table-fixed-rows">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -657,7 +828,7 @@ if (!isset($user)) {
                             </select>
                         </div>
                         <div class="col-md-8 d-flex align-items-end">
-                            <button type="button" class="btn btn-softedu me-2" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
                                 data-bs-target="#addMaterialModal">
                                 <i class="fas fa-plus me-1"></i> Add New Material
                             </button>
@@ -688,10 +859,26 @@ if (!isset($user)) {
                                     $sql .= " AND m.course_id = ?";
                                     $params[] = (int) $_GET['course_id'];
                                 }
-                                $sql .= " ORDER BY m.created_at ASC";
+                                $perPage = 10;
+                                $pageNum = max(1, (int) ($_GET['materials_page'] ?? 1));
+                                $offset = ($pageNum - 1) * $perPage;
+
+                                $countSql = "SELECT COUNT(*) FROM softedu_course_materials m WHERE 1=1";
+                                $countParams = $params;
+                                if (!empty($_GET['course_id'])) {
+                                    $countSql .= " AND m.course_id = ?";
+                                }
+                                $countStmt = $db->prepare($countSql);
+                                $countStmt->execute($countParams);
+                                $totalRows = (int) $countStmt->fetchColumn();
+                                $totalPages = max(1, (int) ceil($totalRows / $perPage));
+
+                                $sql .= " ORDER BY m.created_at ASC LIMIT $perPage OFFSET $offset";
                                 $stmt = $db->prepare($sql);
                                 $stmt->execute($params);
+                                $rowCount = 0;
                                 while ($mat = $stmt->fetch(PDO::FETCH_ASSOC)):
+                                    $rowCount++;
                                     ?>
                                     <tr>
                                         <td><?= htmlspecialchars($mat['course_title']) ?></td>
@@ -706,8 +893,52 @@ if (!isset($user)) {
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
+                                <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
+                                    <tr class="empty-row">
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                <?php endfor; ?>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="pagination-wrap">
+                        <?php if ($totalPages > 1): ?>
+                            <nav aria-label="Materials pagination">
+                                <ul class="pagination">
+                                    <?php
+                                    $prevPage = max(1, $pageNum - 1);
+                                    $nextPage = min($totalPages, $pageNum + 1);
+                                    $baseParams = $_GET;
+                                    $baseParams['page'] = 'materials';
+                                    ?>
+                                    <li class="page-item <?= $pageNum <= 1 ? 'disabled' : '' ?>">
+                                        <a class="page-link"
+                                            href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['materials_page' => $prevPage]))) ?>">
+                                            Previous
+                                        </a>
+                                    </li>
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?= $i === $pageNum ? 'active' : '' ?>">
+                                            <a class="page-link"
+                                                href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['materials_page' => $i]))) ?>">
+                                                <?= $i ?>
+                                            </a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= $pageNum >= $totalPages ? 'disabled' : '' ?>">
+                                        <a class="page-link"
+                                            href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['materials_page' => $nextPage]))) ?>">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
                     </div>
 
                 <?php elseif ($_GET['page'] === 'users'): ?>
@@ -770,10 +1001,32 @@ if (!isset($user)) {
                                     $sql .= " AND DATE(created_at) <= ?";
                                     $params[] = $_GET['end_date'];
                                 }
-                                $sql .= " ORDER BY created_at DESC";
+                                $perPage = 10;
+                                $pageNum = max(1, (int) ($_GET['users_page'] ?? 1));
+                                $offset = ($pageNum - 1) * $perPage;
+
+                                $countSql = "SELECT COUNT(*) FROM softedu_users WHERE 1=1";
+                                $countParams = $params;
+                                if (!empty($_GET['role'])) {
+                                    $countSql .= " AND role = ?";
+                                }
+                                if (!empty($_GET['start_date'])) {
+                                    $countSql .= " AND DATE(created_at) >= ?";
+                                }
+                                if (!empty($_GET['end_date'])) {
+                                    $countSql .= " AND DATE(created_at) <= ?";
+                                }
+                                $countStmt = $db->prepare($countSql);
+                                $countStmt->execute($countParams);
+                                $totalRows = (int) $countStmt->fetchColumn();
+                                $totalPages = max(1, (int) ceil($totalRows / $perPage));
+
+                                $sql .= " ORDER BY created_at DESC LIMIT $perPage OFFSET $offset";
                                 $stmt = $db->prepare($sql);
                                 $stmt->execute($params);
+                                $rowCount = 0;
                                 while ($userRow = $stmt->fetch(PDO::FETCH_ASSOC)):
+                                    $rowCount++;
                                     ?>
                                     <tr>
                                         <td>
@@ -792,14 +1045,58 @@ if (!isset($user)) {
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
+                                <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
+                                    <tr class="empty-row">
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                <?php endfor; ?>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="pagination-wrap">
+                        <?php if ($totalPages > 1): ?>
+                            <nav aria-label="Users pagination">
+                                <ul class="pagination">
+                                    <?php
+                                    $prevPage = max(1, $pageNum - 1);
+                                    $nextPage = min($totalPages, $pageNum + 1);
+                                    $baseParams = $_GET;
+                                    $baseParams['page'] = 'users';
+                                    ?>
+                                    <li class="page-item <?= $pageNum <= 1 ? 'disabled' : '' ?>">
+                                        <a class="page-link"
+                                            href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['users_page' => $prevPage]))) ?>">
+                                            Previous
+                                        </a>
+                                    </li>
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?= $i === $pageNum ? 'active' : '' ?>">
+                                            <a class="page-link"
+                                                href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['users_page' => $i]))) ?>">
+                                                <?= $i ?>
+                                            </a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= $pageNum >= $totalPages ? 'disabled' : '' ?>">
+                                        <a class="page-link"
+                                            href="?<?= htmlspecialchars(http_build_query(array_merge($baseParams, ['users_page' => $nextPage]))) ?>">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
                     </div>
 
                 <?php elseif ($_GET['page'] === 'staff'): ?>
                     <!-- Staff Management -->
                     <h2 class="mb-4">Manage Staff</h2>
-                    <button class="btn btn-softedu mb-3" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addStaffModal">
                         <i class="fas fa-plus me-1"></i> Add New Staff
                     </button>
                     <div class="table-responsive">
@@ -861,6 +1158,30 @@ if (!isset($user)) {
     <?php include 'modals/add_material_modal.php'; ?>
     <?php include 'modals/add_assignment_modal.php'; ?>
     <?php include 'modals/edit_assignment_modal.php'; ?>
+    <!-- Profile Image Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Profile Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Choose Image</label>
+                            <input type="file" class="form-control" name="profile_image" accept="image/*" required>
+                        </div>
+                        <div id="uploadAlert" class="alert d-none"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- ✅ FIXED: Use CORRECT jsPDF legacy build -->
@@ -974,6 +1295,11 @@ document.getElementById('editAssignmentForm')?.addEventListener('submit', async 
                         emailAlert.classList.remove('d-none');
                         return;
                     }
+                    const confirmBtnEl = document.getElementById('confirmApproveBtn');
+                    const originalText = confirmBtnEl.textContent;
+                    confirmBtnEl.disabled = true;
+                    confirmBtnEl.setAttribute('aria-busy', 'true');
+                    confirmBtnEl.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Approving...';
                     try {
                         const res = await fetch('backend/admin/approve_application.php', {
                             method: 'POST',
@@ -991,6 +1317,10 @@ document.getElementById('editAssignmentForm')?.addEventListener('submit', async 
                     } catch (err) {
                         emailAlert.textContent = 'Network error. Try again.';
                         emailAlert.classList.remove('d-none');
+                    } finally {
+                        confirmBtnEl.disabled = false;
+                        confirmBtnEl.removeAttribute('aria-busy');
+                        confirmBtnEl.textContent = originalText;
                     }
                 });
             });
@@ -1375,26 +1705,27 @@ document.getElementById('editAssignmentForm')?.addEventListener('submit', async 
                 }
             });
         });
-        // ===== ADD ASSIGNMENT HANDLER =====
+       // ===== ADD ASSIGNMENT HANDLER =====
 document.getElementById('addAssignmentForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // Get form data
-    const formData = new FormData(e.target);
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const alertBox = document.getElementById('assignmentAlert');
+    alertBox.className = 'alert d-none';
+
     const courseId = formData.get('course_id');
-    const title = formData.get('title');
+    const title = formData.get('title')?.trim();
     const dueDate = formData.get('due_date');
 
-    // Validate required fields
-    if (!courseId || !title || !dueDate) {
-        const alertBox = document.getElementById('assignmentAlert');
+    // Validate required fields (file is optional)
+    if (!courseId || courseId === '0' || !title || !dueDate) {
         alertBox.className = 'alert alert-danger';
-        alertBox.textContent = 'All fields are required.';
+        alertBox.textContent = 'Please fill in all required fields.';
         alertBox.classList.remove('d-none');
         return;
     }
 
-    // Send to backend
     try {
         const res = await fetch('backend/staff/add_assignment.php', {
             method: 'POST',
@@ -1404,33 +1735,135 @@ document.getElementById('addAssignmentForm')?.addEventListener('submit', async (
         const result = await res.json();
 
         if (result.success) {
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('addAssignmentModal')).hide();
-            
-            // Show success & reload
-            const alertBox = document.getElementById('assignmentAlert');
             alertBox.className = 'alert alert-success';
             alertBox.textContent = 'Assignment added successfully!';
             alertBox.classList.remove('d-none');
-            
-            // Reload assignments table after 1 second
             setTimeout(() => location.reload(), 1000);
         } else {
-            // Show error
-            const alertBox = document.getElementById('assignmentAlert');
             alertBox.className = 'alert alert-danger';
             alertBox.textContent = result.message || 'Failed to add assignment.';
             alertBox.classList.remove('d-none');
         }
     } catch (err) {
         console.error('Assignment submission error:', err);
-        const alertBox = document.getElementById('assignmentAlert');
         alertBox.className = 'alert alert-danger';
         alertBox.textContent = 'Network error. Please try again.';
         alertBox.classList.remove('d-none');
     }
 });
+
     </script>
+    <script>
+    // Profile Image Upload
+    document.getElementById('profilePreview').addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
+        modal.show();
+    });
+
+    // Update Name
+    document.getElementById('nameForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const alertBox = document.getElementById('nameAlert');
+        alertBox.className = 'alert d-none';
+
+        try {
+            const res = await fetch('backend/user/profile_update.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                alertBox.className = 'alert alert-success';
+                // Update session name
+                const sessionName = document.querySelector('[data-session-name]');
+                if (sessionName) sessionName.textContent = formData.get('name');
+            } else {
+                alertBox.className = 'alert alert-danger';
+            }
+            alertBox.textContent = result.message;
+            alertBox.classList.remove('d-none');
+        } catch (err) {
+            alertBox.className = 'alert alert-danger';
+            alertBox.textContent = 'Network error.';
+            alertBox.classList.remove('d-none');
+        }
+    });
+
+    // Change Password
+    document.getElementById('passwordForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const alertBox = document.getElementById('passwordAlert');
+        alertBox.className = 'alert d-none';
+
+        if (formData.get('new_password') !== formData.get('confirm_password')) {
+            alertBox.className = 'alert alert-danger';
+            alertBox.textContent = 'Passwords do not match.';
+            alertBox.classList.remove('d-none');
+            return;
+        }
+
+        try {
+            const res = await fetch('backend/user/password_change.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                alertBox.className = 'alert alert-success';
+                e.target.reset();
+            } else {
+                alertBox.className = 'alert alert-danger';
+            }
+            alertBox.textContent = result.message;
+            alertBox.classList.remove('d-none');
+        } catch (err) {
+            alertBox.className = 'alert alert-danger';
+            alertBox.textContent = 'Network error.';
+            alertBox.classList.remove('d-none');
+        }
+    });
+
+    // Upload Profile Image
+    document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const alertBox = document.getElementById('uploadAlert');
+        alertBox.className = 'alert d-none';
+
+        try {
+            const res = await fetch('backend/user/profile_image_upload.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                alertBox.className = 'alert alert-success';
+                // Update profile image
+                document.getElementById('profilePreview').src = 'uploads/profiles/' + result.filename + '?t=' + Date.now();
+
+                // Close modal after success
+                setTimeout(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+                    e.target.reset();
+                }, 1500);
+            } else {
+                alertBox.className = 'alert alert-danger';
+            }
+            alertBox.textContent = result.message;
+            alertBox.classList.remove('d-none');
+        } catch (err) {
+            alertBox.className = 'alert alert-danger';
+            alertBox.textContent = 'Network error.';
+            alertBox.classList.remove('d-none');
+        }
+    });
+</script>
 </body>
 
 </html>
