@@ -835,7 +835,8 @@ $page = $_GET['page'] ?? 'courses';
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js    "></script>
+    <?php include 'includes/scripts.php'; ?>
+    <script src="assets/js/dashboard-common.js"></script>
     <script>
         <?php if (isset($_SESSION['show_welcome']) && $_SESSION['show_welcome']): ?>
             document.addEventListener('DOMContentLoaded', function () {
@@ -926,114 +927,6 @@ $page = $_GET['page'] ?? 'courses';
 
 </body>
 <script>
-    // Profile Image Upload
-    document.getElementById('profilePreview').addEventListener('click', () => {
-        const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
-        modal.show();
-    });
-
-    // Update Name
-    document.getElementById('nameForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const alertBox = document.getElementById('nameAlert');
-        alertBox.className = 'alert d-none';
-
-        try {
-            const res = await fetch('backend/user/profile_update.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await res.json();
-
-            if (result.success) {
-                alertBox.className = 'alert alert-success';
-                // Update session name
-                const sessionName = document.querySelector('[data-session-name]');
-                if (sessionName) sessionName.textContent = formData.get('name');
-            } else {
-                alertBox.className = 'alert alert-danger';
-            }
-            alertBox.textContent = result.message;
-            alertBox.classList.remove('d-none');
-        } catch (err) {
-            alertBox.className = 'alert alert-danger';
-            alertBox.textContent = 'Network error.';
-            alertBox.classList.remove('d-none');
-        }
-    });
-
-    // Change Password
-    document.getElementById('passwordForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const alertBox = document.getElementById('passwordAlert');
-        alertBox.className = 'alert d-none';
-
-        if (formData.get('new_password') !== formData.get('confirm_password')) {
-            alertBox.className = 'alert alert-danger';
-            alertBox.textContent = 'Passwords do not match.';
-            alertBox.classList.remove('d-none');
-            return;
-        }
-
-        try {
-            const res = await fetch('backend/user/password_change.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await res.json();
-
-            if (result.success) {
-                alertBox.className = 'alert alert-success';
-                e.target.reset();
-            } else {
-                alertBox.className = 'alert alert-danger';
-            }
-            alertBox.textContent = result.message;
-            alertBox.classList.remove('d-none');
-        } catch (err) {
-            alertBox.className = 'alert alert-danger';
-            alertBox.textContent = 'Network error.';
-            alertBox.classList.remove('d-none');
-        }
-    });
-
-    // Upload Profile Image
-    document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const alertBox = document.getElementById('uploadAlert');
-        alertBox.className = 'alert d-none';
-
-        try {
-            const res = await fetch('backend/user/profile_image_upload.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await res.json();
-
-            if (result.success) {
-                alertBox.className = 'alert alert-success';
-                // Update profile image
-                document.getElementById('profilePreview').src = 'uploads/profiles/' + result.filename + '?t=' + Date.now();
-
-                // Close modal after success
-                setTimeout(() => {
-                    bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
-                    e.target.reset();
-                }, 1500);
-            } else {
-                alertBox.className = 'alert alert-danger';
-            }
-            alertBox.textContent = result.message;
-            alertBox.classList.remove('d-none');
-        } catch (err) {
-            alertBox.className = 'alert alert-danger';
-            alertBox.textContent = 'Network error.';
-            alertBox.classList.remove('d-none');
-        }
-    });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {

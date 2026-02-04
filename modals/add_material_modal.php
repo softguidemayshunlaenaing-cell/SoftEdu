@@ -6,7 +6,7 @@
                 <h5 class="modal-title">Add New Course Material</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="addMaterialForm" method="post">
+            <form id="addMaterialForm" method="post"<?= !empty($addMaterialRedirect) ? ' data-success-redirect="' . htmlspecialchars($addMaterialRedirect) . '"' : '' ?>>
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-6">

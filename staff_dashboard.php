@@ -18,242 +18,32 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-green: #059669;
-            --primary-light: #f0fdf4;
-            --primary-dark: #065f46;
-            --bg-main: #f8fafc;
-            --surface: #ffffff;
-            --nav-dark: #2C2A32;
-            --border-color: #e2e8f0;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: #334155;
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            margin: 0;
-        }
-
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
-            background: var(--surface);
-            overflow: hidden;
-        }
-
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary-green) 0%, #10b981 100%);
-            height: 120px;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border: 5px solid #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-        }
-
-        .navbar {
-            background-color: var(--nav-dark);
-            padding: 0.75rem 1.5rem;
-        }
-
-        .sidebar {
-            background-color: var(--surface);
-            height: calc(100vh - 56px);
-            position: sticky;
-            top: 56px;
-            border-right: 1px solid var(--border-color);
-            padding: 20px;
-        }
-
-        .nav-link {
-            color: #475569;
-            padding: 12px 15px;
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
-            text-decoration: none;
-            display: block;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background-color: var(--primary-light);
-            color: var(--primary-green);
-            font-weight: 600;
-        }
-
-        /* Green Buttons */
-        .btn-green {
-            background-color: var(--primary-green);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .btn-green:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-green:active {
-            transform: scale(0.98);
-        }
-
-        /* Small Green Buttons */
-        .btn-green-sm {
-            background-color: var(--primary-green);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .btn-green-sm:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .form-label {
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: #475569;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .form-control {
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-green);
-            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
-        }
-
-        .role-badge {
-            background: var(--primary-light);
-            color: var(--primary-green);
-            font-weight: 700;
-            font-size: 0.7rem;
-            padding: 4px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: var(--primary-light);
-        }
-        .pagination-wrap {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 1rem;
-            min-height: 48px;
-        }
-        .table-fixed-rows {
-            min-height: 600px;
-        }
-        .empty-row td {
-            height: 48px;
-        }
-
-        @media (max-width: 576px) {
-            .container {
-                padding: 0 12px;
-            }
-
-            .card-body {
-                padding: 1.5rem !important;
-            }
-
-            .profile-img {
-                width: 100px;
-                height: 100px;
-            }
-
-            .sidebar {
-                position: static;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .btn-lg-mobile {
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/dashboard-shared.css">
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="staff_dashboard.php">SoftEdu Staff</a>
-            <div class="d-flex align-items-center">
-                <?php
-                $imgSrc = $user['profile_image']
-                    ? 'uploads/profiles/' . htmlspecialchars($user['profile_image'])
-                    : 'https://ui-avatars.com/api/?name=' . substr(htmlspecialchars($user['name']), 0, 1) . '&background=0d6efd&color=fff';
-                ?>
-                <img src="<?= $imgSrc ?>" class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
-                <span class="text-white me-3"><?= htmlspecialchars($user['name']) ?></span>
-                <a href="backend/auth/logout.php" class="btn btn-outline-light btn-sm">Logout</a>
-            </div>
-        </div>
-    </nav>
+    <?php
+    $brandHref = 'staff_dashboard.php';
+    $brandText = 'SoftEdu Staff';
+    $avatarFallback = 'https://ui-avatars.com/api/?name=' . substr(htmlspecialchars($user['name']), 0, 1) . '&background=0d6efd&color=fff';
+    ?>
+    <?php include 'includes/dashboard_navbar.php'; ?>
 
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 sidebar">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link <?= ($_GET['page'] ?? '') === 'profile' ? 'active' : '' ?>"
-                            href="staff_dashboard.php?page=profile">
-                            <i class="fas fa-user-circle me-2"></i> My Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= (!isset($_GET['page']) || $_GET['page'] === 'courses') ? 'active' : '' ?>"
-                            href="staff_dashboard.php?page=courses">
-                            <i class="fas fa-book me-2"></i> Courses
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= ($_GET['page'] ?? '') === 'materials' ? 'active' : '' ?>"
-                            href="staff_dashboard.php?page=materials">
-                            <i class="fas fa-file-video me-2"></i> Materials
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= ($_GET['page'] ?? '') === 'assignments' ? 'active' : '' ?>"
-                            href="staff_dashboard.php?page=assignments">
-                            <i class="fas fa-tasks me-2"></i> Assignments
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <?php
+            $currentPage = $_GET['page'] ?? 'courses';
+            $sidebarWrapperClass = 'col-md-3 col-lg-2 sidebar';
+            $menu = [
+                ['key' => 'profile', 'label' => 'My Profile', 'icon' => 'user-circle', 'href' => 'staff_dashboard.php?page=profile'],
+                ['key' => 'courses', 'label' => 'Courses', 'icon' => 'book', 'href' => 'staff_dashboard.php?page=courses'],
+                ['key' => 'materials', 'label' => 'Materials', 'icon' => 'file-video', 'href' => 'staff_dashboard.php?page=materials'],
+                ['key' => 'assignments', 'label' => 'Assignments', 'icon' => 'tasks', 'href' => 'staff_dashboard.php?page=assignments'],
+            ];
+            ?>
+            <?php include 'includes/dashboard_sidebar.php'; ?>
 
             <!-- Main Content -->
             <main class="col-md-9 col-lg-10 p-4">
@@ -285,7 +75,9 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                                             <?php if ($course['image']): ?>
                                                 <img src="uploads/courses/<?= htmlspecialchars($course['image']) ?>" width="60"
                                                     class="rounded">
-                                            <?php else: ?>—<?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="text-muted small">No Image</span>
+                                            <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($course['title']) ?></td>
                                         <td><?= htmlspecialchars($course['duration']) ?></td>
@@ -297,9 +89,9 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                                             </span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-green-sm materials-btn"
+                                            <button class="btn btn-sm btn-outline-info materials-btn"
                                                 data-id="<?= $course['id'] ?>">Materials</button>
-                                            <button class="btn btn-green-sm edit-course-btn"
+                                            <button class="btn btn-sm btn-outline-primary edit-course-btn"
                                                 data-id="<?= $course['id'] ?>">Edit</button>
                                             <button class="btn btn-outline-danger btn-sm delete-course-btn"
                                                 data-id="<?= $course['id'] ?>">Delete</button>
@@ -320,7 +112,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                             <select name="course_id" class="form-select" onchange="this.form.submit()">
                                 <option value="">All Courses</option>
                                 <?php
-                                // ✅ FIXED: Fetch ALL courses (not filtered)
                                 $courseStmt = $db->query("SELECT id, title FROM softedu_courses ORDER BY title");
                                 while ($c = $courseStmt->fetch(PDO::FETCH_ASSOC)):
                                     $selected = (isset($_GET['course_id']) && $_GET['course_id'] == $c['id']) ? 'selected' : '';
@@ -445,72 +236,10 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     </div>
 
                 <?php elseif (($_GET['page'] ?? '') === 'profile'): ?>
-                    <!-- PROFILE TAB -->
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="text-center mb-4">
-                                <?php
-                                $imgSrc = !empty($user['profile_image'])
-                                    ? 'uploads/profiles/' . htmlspecialchars($user['profile_image'])
-                                    : 'https://ui-avatars.com/api/?name=' . urlencode($user['name']) . '&background=059669&color=fff&size=128';
-                                ?>
-                                <img src="<?= $imgSrc ?>" id="profilePreview" class="rounded-circle mb-3" width="120"
-                                    height="120" style="object-fit: cover; border: 3px solid #e2e8f0;">
-                                <h4 class="mb-1"><?= htmlspecialchars($user['name']) ?></h4>
-                                <span class="badge bg-success"><?= ucfirst($_SESSION['user_role']) ?></span>
-                            </div>
-                            <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" data-bs-toggle="tab"
-                                        data-bs-target="#accountTab">Account</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" data-bs-toggle="tab"
-                                        data-bs-target="#securityTab">Security</button>
-                                </li>
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane fade show active" id="accountTab">
-                                    <form id="nameForm">
-                                        <div class="mb-3">
-                                            <label class="form-label fw-medium">Full Name</label>
-                                            <input type="text" class="form-control" name="name"
-                                                value="<?= htmlspecialchars($user['name']) ?>" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label fw-medium">Email Address (Read Only)</label>
-                                            <input type="email" class="form-control bg-light"
-                                                value="<?= htmlspecialchars($_SESSION['user_email']) ?>" disabled>
-                                        </div>
-                                        <button type="submit" class="btn btn-green">Update Name</button>
-                                        <div id="nameAlert" class="alert d-none mt-3"></div>
-                                    </form>
-                                </div>
-                                <div class="tab-pane fade" id="securityTab">
-                                    <form id="passwordForm">
-                                        <div class="mb-3">
-                                            <label class="form-label fw-medium">Current Password</label>
-                                            <input type="password" class="form-control" name="current_password" required>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-medium">New Password</label>
-                                                <input type="password" class="form-control" name="new_password"
-                                                    minlength="8" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-medium">Confirm New Password</label>
-                                                <input type="password" class="form-control" name="confirm_password"
-                                                    required>
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn btn-green">Change Password</button>
-                                        <div id="passwordAlert" class="alert d-none mt-3"></div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php
+                    $profileBtnClass = 'btn btn-green';
+                    ?>
+                    <?php include 'includes/profile_panel.php'; ?>
 
                 <?php elseif ($_GET['page'] === 'assignments'): ?>
                     <!-- ASSIGNMENTS TAB -->
@@ -653,8 +382,8 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                                         <td><?= htmlspecialchars($sub['student_name']) ?><br><small><?= htmlspecialchars($sub['email']) ?></small>
                                         </td>
                                         <td>
-                                            <a href="uploads/assignments/<?= htmlspecialchars($sub['file_path']) ?>"
-                                                target="_blank" class="btn btn-sm btn-outline-primary">View File</a>
+                                            <a href="<?= htmlspecialchars($sub['file_path']) ?>" target="_blank"
+                                                class="btn btn-sm btn-outline-primary">View File</a>
                                         </td>
                                         <td><?= date('M j, Y g:i A', strtotime($sub['submitted_at'])) ?></td>
                                         <td>
@@ -672,252 +401,24 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Modals -->
+    <?php
+    $quickAddSuccess = 'reload';
+    $addMaterialRedirect = 'staff_dashboard.php?page=materials';
+    ?>
     <?php include 'modals/course_modal.php'; ?>
     <?php include 'modals/materials_modal.php'; ?>
     <?php include 'modals/add_material_modal.php'; ?>
     <?php include 'modals/add_assignment_modal.php'; ?>
     <?php include 'modals/edit_assignment_modal.php'; ?>
 
-    <!-- Profile Image Upload Modal -->
-    <div class="modal fade" id="uploadModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Profile Photo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="uploadForm" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Choose Image</label>
-                            <input type="file" class="form-control" name="profile_image" accept="image/*" required>
-                        </div>
-                        <div id="uploadAlert" class="alert d-none"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-green">Upload</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <?php
+    $uploadBtnClass = 'btn btn-green';
+    ?>
+    <?php include 'includes/profile_upload_modal.php'; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <?php include 'includes/scripts.php'; ?>
+    <script src="assets/js/dashboard-common.js"></script>
     <script>
-        // ===== COURSE MANAGEMENT =====
-        document.querySelector('[data-bs-target="#courseModal"]')?.addEventListener('click', () => {
-            document.getElementById('courseForm').reset();
-            document.getElementById('courseImagePreview').style.display = 'none';
-            document.getElementById('courseId').value = '';
-            document.getElementById('courseModalLabel').textContent = 'Add New Course';
-        });
-
-        document.getElementById('courseForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const alertBox = document.getElementById('courseAlert');
-            if (alertBox) alertBox.className = 'alert d-none';
-            try {
-                const url = formData.get('id')
-                    ? 'backend/course/edit_course.php'
-                    : 'backend/course/add_course.php';
-                const res = await fetch(url, { method: 'POST', body: formData });
-                const result = await res.json();
-                if (result.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
-                    setTimeout(() => location.reload(), 800);
-                } else {
-                    if (alertBox) {
-                        alertBox.className = 'alert alert-danger';
-                        alertBox.textContent = result.message;
-                        alertBox.classList.remove('d-none');
-                    }
-                }
-            } catch (err) {
-                if (alertBox) {
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.textContent = 'Network error.';
-                    alertBox.classList.remove('d-none');
-                }
-            }
-        });
-
-        // ===== MATERIALS BUTTON HANDLER =====
-        document.querySelectorAll('.materials-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const courseId = btn.dataset.id;
-                const courseIdField = document.getElementById('materialCourseId');
-                if (courseIdField) courseIdField.value = courseId;
-                try {
-                    const res = await fetch(`backend/course/get_materials.php?course_id=${courseId}`);
-                    const materials = await res.json();
-                    let html = '<h6>Existing Materials:</h6>';
-                    if (materials.length > 0) {
-                        html += '<ul class="list-group">';
-                        materials.forEach(m => {
-                            html += `<li class="list-group-item">${m.title} (${m.source})</li>`;
-                        });
-                        html += '</ul>';
-                    } else {
-                        html += '<p class="text-muted">No materials yet.</p>';
-                    }
-                    document.getElementById('materialsList').innerHTML = html;
-                    bootstrap.Modal.getOrCreateInstance(document.getElementById('materialsModal')).show();
-                } catch (err) {
-                    alert('Failed to load materials.');
-                }
-            });
-        });
-
-        // ===== EDIT COURSE BUTTON HANDLER =====
-        document.querySelectorAll('.edit-course-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.dataset.id;
-                try {
-                    const res = await fetch(`backend/course/get_course.php?id=${id}`);
-                    const course = await res.json();
-                    if (course) {
-                        document.getElementById('courseId').value = course.id;
-                        document.getElementById('courseTitle').value = course.title;
-                        document.getElementById('courseDescription').value = course.description || '';
-                        document.getElementById('courseDuration').value = course.duration || '';
-                        document.getElementById('courseFee').value = course.fee || '';
-                        document.getElementById('courseStatus').value = course.status;
-                        const preview = document.getElementById('courseImagePreview');
-                        if (course.image) {
-                            preview.src = `uploads/courses/${course.image}`;
-                            preview.style.display = 'block';
-                        } else {
-                            preview.style.display = 'none';
-                        }
-                        document.getElementById('courseModalLabel').textContent = 'Edit Course';
-                        bootstrap.Modal.getOrCreateInstance(document.getElementById('courseModal')).show();
-                    }
-                } catch (err) {
-                    alert('Failed to load course data.');
-                }
-            });
-        });
-
-        // ===== DELETE HANDLERS =====
-        document.querySelectorAll('.delete-course-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (!confirm('Delete this course?')) return;
-                const id = btn.dataset.id;
-                try {
-                    const res = await fetch('backend/course/delete_course.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id })
-                    });
-                    const result = await res.json();
-                    if (result.success) location.reload();
-                    else alert(result.message);
-                } catch (err) {
-                    alert('Failed to delete course.');
-                }
-            });
-        });
-
-        document.querySelectorAll('.delete-material-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (!confirm('Delete this material?')) return;
-                const id = btn.dataset.id;
-                try {
-                    await fetch('backend/course/delete_material.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id })
-                    });
-                    btn.closest('tr')?.remove();
-                } catch (err) {
-                    alert('Failed to delete material.');
-                }
-            });
-        });
-
-        // ===== ADD MATERIAL (from Materials tab modal) =====
-        document.getElementById('addMaterialForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const alertBox = document.getElementById('addMaterialAlert');
-            if (alertBox) alertBox.className = 'alert d-none';
-            try {
-                const res = await fetch('backend/course/add_material.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
-                if (result.success) {
-                    if (alertBox) {
-                        alertBox.className = 'alert alert-success';
-                        alertBox.textContent = result.message || 'Material added successfully.';
-                        alertBox.classList.remove('d-none');
-                    }
-                    e.target.reset();
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById('addMaterialModal'))?.hide();
-                        window.location.href = 'staff_dashboard.php?page=materials';
-                    }, 800);
-                } else if (alertBox) {
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.textContent = result.message || 'Failed to add material.';
-                    alertBox.classList.remove('d-none');
-                }
-            } catch (err) {
-                if (alertBox) {
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.textContent = 'Network error.';
-                    alertBox.classList.remove('d-none');
-                }
-            }
-        });
-
-        // ===== QUICK ADD MATERIAL (from Courses tab modal) =====
-        document.getElementById('quickAddMaterialForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const alertBox = document.getElementById('materialAlert');
-            if (alertBox) alertBox.className = 'alert d-none';
-            const courseId = formData.get('course_id');
-            if (!courseId) {
-                if (alertBox) {
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.textContent = 'Please select a course first.';
-                    alertBox.classList.remove('d-none');
-                }
-                return;
-            }
-            try {
-                const res = await fetch('backend/course/add_material.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
-                if (result.success) {
-                    if (alertBox) {
-                        alertBox.className = 'alert alert-success';
-                        alertBox.textContent = result.message || 'Material added successfully.';
-                        alertBox.classList.remove('d-none');
-                    }
-                    e.target.reset();
-                    document.getElementById('materialCourseId').value = courseId;
-                    setTimeout(() => location.reload(), 800);
-                } else if (alertBox) {
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.textContent = result.message || 'Failed to add material.';
-                    alertBox.classList.remove('d-none');
-                }
-            } catch (err) {
-                if (alertBox) {
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.textContent = 'Network error.';
-                    alertBox.classList.remove('d-none');
-                }
-            }
-        });
-
         // ===== ASSIGNMENT MANAGEMENT =====
         document.getElementById('addAssignmentForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -980,137 +481,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
             } catch (err) {
                 alertBox.className = 'alert alert-danger';
                 alertBox.textContent = 'Network error. Please try again.';
-                alertBox.classList.remove('d-none');
-            }
-        });
-
-        document.querySelectorAll('.delete-assignment-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (!confirm('Delete this assignment and all submissions?')) return;
-                const id = btn.dataset.id;
-                try {
-                    const res = await fetch('backend/admin/delete_assignment.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id })
-                    });
-                    const result = await res.json();
-                    if (result.success) location.reload();
-                    else alert(result.message);
-                } catch (err) {
-                    alert('Failed to delete assignment.');
-                }
-            });
-        });
-
-        document.querySelectorAll('.delete-submission-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (!confirm('Delete this submission?')) return;
-                const id = btn.dataset.id;
-                try {
-                    const res = await fetch('backend/admin/delete_submission.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id })
-                    });
-                    const result = await res.json();
-                    if (result.success) location.reload();
-                    else alert(result.message);
-                } catch (err) {
-                    alert('Failed to delete submission.');
-                }
-            });
-        });
-
-        // ===== PROFILE MANAGEMENT =====
-        document.getElementById('profilePreview').addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
-            modal.show();
-        });
-
-        document.getElementById('nameForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const alertBox = document.getElementById('nameAlert');
-            alertBox.className = 'alert d-none';
-            try {
-                const res = await fetch('backend/user/profile_update.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
-                if (result.success) {
-                    alertBox.className = 'alert alert-success';
-                } else {
-                    alertBox.className = 'alert alert-danger';
-                }
-                alertBox.textContent = result.message;
-                alertBox.classList.remove('d-none');
-            } catch (err) {
-                alertBox.className = 'alert alert-danger';
-                alertBox.textContent = 'Network error.';
-                alertBox.classList.remove('d-none');
-            }
-        });
-
-        document.getElementById('passwordForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const alertBox = document.getElementById('passwordAlert');
-            alertBox.className = 'alert d-none';
-            if (formData.get('new_password') !== formData.get('confirm_password')) {
-                alertBox.className = 'alert alert-danger';
-                alertBox.textContent = 'Passwords do not match.';
-                alertBox.classList.remove('d-none');
-                return;
-            }
-            try {
-                const res = await fetch('backend/user/password_change.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
-                if (result.success) {
-                    alertBox.className = 'alert alert-success';
-                    e.target.reset();
-                } else {
-                    alertBox.className = 'alert alert-danger';
-                }
-                alertBox.textContent = result.message;
-                alertBox.classList.remove('d-none');
-            } catch (err) {
-                alertBox.className = 'alert alert-danger';
-                alertBox.textContent = 'Network error.';
-                alertBox.classList.remove('d-none');
-            }
-        });
-
-        document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const alertBox = document.getElementById('uploadAlert');
-            alertBox.className = 'alert d-none';
-            try {
-                const res = await fetch('backend/user/profile_image_upload.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
-                if (result.success) {
-                    alertBox.className = 'alert alert-success';
-                    document.getElementById('profilePreview').src = 'uploads/profiles/' + result.filename + '?t=' + Date.now();
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
-                        e.target.reset();
-                    }, 1500);
-                } else {
-                    alertBox.className = 'alert alert-danger';
-                }
-                alertBox.textContent = result.message;
-                alertBox.classList.remove('d-none');
-            } catch (err) {
-                alertBox.className = 'alert alert-danger';
-                alertBox.textContent = 'Network error.';
                 alertBox.classList.remove('d-none');
             }
         });

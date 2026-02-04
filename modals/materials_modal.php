@@ -9,7 +9,7 @@
             <div class="modal-body">
                 <div id="materialsList"></div>
                 <hr>
-                <form id="quickAddMaterialForm" method="post" action="backend/course/add_material.php">
+                <form id="quickAddMaterialForm" method="post" action="backend/course/add_material.php"<?= !empty($quickAddSuccess) ? ' data-on-success="' . htmlspecialchars($quickAddSuccess) . '"' : '' ?>>
                     <input type="hidden" name="course_id" id="materialCourseId">
                     <div class="row g-2">
                         <div class="col-md-4">
