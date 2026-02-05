@@ -14,8 +14,8 @@ require_once '../config/db.php';
 $db = (new Database())->getConnection();
 
 try {
-    // Fetch user
-    $stmt = $db->prepare("SELECT * FROM softedu_users WHERE id = ?");
+    // Fetch user and onboarding flags/doc fields from students table
+    $stmt = $db->prepare("SELECT u.id, u.name, u.email, u.password, u.role, IFNULL(s.nrc_front,'') AS nrc_front, IFNULL(s.nrc_back,'') AS nrc_back, IFNULL(s.thangounsayin_front,'') AS thangounsayin_front, IFNULL(s.thangounsayin_back,'') AS thangounsayin_back, IFNULL(s.force_password_change,0) AS force_password_change, IFNULL(s.force_document_upload,0) AS force_document_upload FROM softedu_users u LEFT JOIN softedu_students s ON s.user_id = u.id WHERE u.id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -67,12 +67,11 @@ try {
     // Password update
     if ($needPassword) {
         $hashed = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
-        $stmt = $db->prepare("
-            UPDATE softedu_users 
-            SET password = ?, force_password_change = 0 
-            WHERE id = ?
-        ");
+        $stmt = $db->prepare("UPDATE softedu_users SET password = ? WHERE id = ?");
         $stmt->execute([$hashed, $user['id']]);
+        // clear the flag on students table
+        $stmt = $db->prepare("UPDATE softedu_students SET force_password_change = 0 WHERE user_id = ?");
+        $stmt->execute([$user['id']]);
     }
 
     // Document upload
@@ -89,24 +88,12 @@ try {
             $uploads[$file] = $filename;
         }
 
-        $stmt = $db->prepare("
-            UPDATE softedu_users 
-            SET 
-                nrc_front = ?,
-                nrc_back = ?,
-                thangounsayin_front = ?,
-                thangounsayin_back = ?,
-                force_document_upload = 0
-            WHERE id = ?
-        ");
+        // Store documents and clear flag on students table
+        $stmt = $db->prepare("UPDATE softedu_students SET nrc_front = ?, nrc_back = ?, thangounsayin_front = ?, thangounsayin_back = ?, force_document_upload = 0 WHERE user_id = ?");
 
-        $stmt->execute([
-            $uploads['nrc_front'],
-            $uploads['nrc_back'],
-            $uploads['thangounsayin_front'],
-            $uploads['thangounsayin_back'],
-            $user['id']
-        ]);
+        $stmt->execute([$uploads['nrc_front'], $uploads['nrc_back'], $uploads['thangounsayin_front'], $uploads['thangounsayin_back'], $user['id']]);
+
+
     }
 
     // ✅ ALL GOOD

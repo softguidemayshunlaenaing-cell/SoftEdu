@@ -11,11 +11,11 @@ $user_id = (int) $_GET['user_id'];
 $database = new Database();
 $db = $database->getConnection();
 
-$stmt = $db->prepare("SELECT nrc_front, nrc_back, thangounsayin_front, thangounsayin_back FROM softedu_users WHERE id = ?");
+$stmt = $db->prepare("SELECT nrc_front, nrc_back, thangounsayin_front, thangounsayin_back FROM softedu_students WHERE user_id = ?");
 $stmt->execute([$user_id]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$student = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$user) {
+if (!$student) {
     echo json_encode([]);
     exit;
 }
@@ -24,14 +24,14 @@ $fields = ['nrc_front', 'nrc_back', 'thangounsayin_front', 'thangounsayin_back']
 $result = [];
 
 foreach ($fields as $field) {
-    if (!empty($user[$field])) {
+    if (!empty($student[$field])) {
         // ✅ Use absolute URL to avoid CORS
         $host = $_SERVER['HTTP_HOST'];
         $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
         $baseUrl = "$scheme://$host/softedu";
         $result[] = [
-            'file_name' => $user[$field],
-            'file_url' => $baseUrl . '/uploads/documents/' . $user[$field]
+            'file_name' => $student[$field],
+            'file_url' => $baseUrl . '/uploads/documents/' . $student[$field]
         ];
     }
 }

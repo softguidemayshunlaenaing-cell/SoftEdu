@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 require_once __DIR__ . '/backend/config/db.php';
 $database = new Database();
@@ -189,12 +191,12 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                                 <?php endwhile; ?>
                                 <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
                                     <tr class="empty-row">
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
                                     </tr>
                                 <?php endfor; ?>
                             </tbody>

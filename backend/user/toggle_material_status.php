@@ -1,5 +1,9 @@
 <?php
 session_start();
+// Local debug helpers
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
@@ -11,10 +15,10 @@ require_once __DIR__ . '/../config/db.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 $material_id = (int) ($data['material_id'] ?? 0);
-$student_id = (int) ($data['student_id'] ?? 0);
+$student_id = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
 
-if (!$material_id || $student_id !== $_SESSION['user_id']) {
-    echo json_encode(['success' => false, 'message' => 'Invalid request']);
+if (!$material_id) {
+    echo json_encode(['success' => false, 'message' => 'Invalid request: missing material_id']);
     exit;
 }
 
@@ -83,6 +87,7 @@ try {
 
 } catch (Exception $e) {
     error_log("Toggle error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Server error']);
+    // Return error message for local debugging
+    echo json_encode(['success' => false, 'message' => 'Server error', 'error' => $e->getMessage()]);
 }
 ?>

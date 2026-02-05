@@ -1,5 +1,9 @@
 <?php
 session_start();
+// Enable error display for local debugging (remove in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
     exit;
@@ -9,7 +13,7 @@ require_once __DIR__ . '/backend/config/db.php';
 $database = new Database();
 $db = $database->getConnection();
 
-$stmt = $db->prepare("SELECT name, email, role, profile_image, force_password_change, force_document_upload FROM softedu_users WHERE id = ?");
+$stmt = $db->prepare("SELECT u.name, u.email, u.role, u.profile_image, IFNULL(s.force_password_change,0) AS force_password_change, IFNULL(s.force_document_upload,0) AS force_document_upload FROM softedu_users u LEFT JOIN softedu_students s ON s.user_id = u.id WHERE u.id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

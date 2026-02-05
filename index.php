@@ -35,6 +35,22 @@ session_start();
             color: var(--primary-green) !important;
             /* Change to your desired hover color */
         }
+
+        .feature-card,
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .feature-card:hover,
+        #learning-path .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+        }
     </style>
 
 </head>
@@ -155,30 +171,54 @@ session_start();
     </div>
 
 
-    </div>
 
-    <section id="learning-path" class="py-5">
-        <div class="container pt-5">
-            <div class="row g-4 justify-content-center">
+
+    <section id="learning-path" class="py-5 bg-white">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold" style="font-family: 'Playfair Display', serif;">Your Journey to Success
+                </h2>
+                <p class="text-muted mx-auto" style="max-width: 600px;">Follow our structured path designed to take you
+                    from a beginner to an industry-ready professional.</p>
+            </div>
+
+            <div class="row g-4 justify-content-center position-relative">
                 <div class="col-md-4">
-                    <div class="card feature-card p-5 text-center">
-                        <div class="icon-box"><i class="bi bi-mortarboard-fill fs-2"></i></div>
-                        <h4 class="fw-bold">Expert Faculty</h4>
-                        <p class="text-muted mb-0">Learn from top industry leaders and researchers globally.</p>
+                    <div class="card border-0 text-center h-100 p-4">
+                        <div class="step-number mb-4 mx-auto d-flex align-items-center justify-content-center bg-success text-white rounded-circle"
+                            style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">1</div>
+                        <div class="icon-box mb-3 mx-auto text-success">
+                            <i class="bi bi-person-plus-fill fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">Easy Enrollment</h4>
+                        <p class="text-muted">Choose your desired program and complete the simple application process to
+                            get started.</p>
                     </div>
                 </div>
+
                 <div class="col-md-4">
-                    <div class="card feature-card p-5 text-center">
-                        <div class="icon-box"><i class="bi bi-globe2 fs-2"></i></div>
-                        <h4 class="fw-bold">Global Reach</h4>
-                        <p class="text-muted mb-0">Join an alumni network spanning over 45 countries.</p>
+                    <div class="card border-0 text-center h-100 p-4">
+                        <div class="step-number mb-4 mx-auto d-flex align-items-center justify-content-center bg-success text-white rounded-circle"
+                            style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">2</div>
+                        <div class="icon-box mb-3 mx-auto text-success">
+                            <i class="bi bi-book-half fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">Expert-Led Learning</h4>
+                        <p class="text-muted">Engage with interactive lessons, live sessions, and practical projects
+                            guided by industry mentors.</p>
                     </div>
                 </div>
+
                 <div class="col-md-4">
-                    <div class="card feature-card p-5 text-center">
-                        <div class="icon-box"><i class="bi bi-lightning-charge-fill fs-2"></i></div>
-                        <h4 class="fw-bold">Fast-Track Learning</h4>
-                        <p class="text-muted mb-0">Modern curriculums designed for immediate industry entry.</p>
+                    <div class="card border-0 text-center h-100 p-4">
+                        <div class="step-number mb-4 mx-auto d-flex align-items-center justify-content-center bg-success text-white rounded-circle"
+                            style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">3</div>
+                        <div class="icon-box mb-3 mx-auto text-success">
+                            <i class="bi bi-mortarboard-fill fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">Global Certification</h4>
+                        <p class="text-muted">Receive your accredited certificate and gain access to our worldwide
+                            alumni and job network.</p>
                     </div>
                 </div>
             </div>
@@ -228,10 +268,38 @@ session_start();
                 </div>
 
                 <div class="col-lg-6 d-flex flex-column">
-                    <div class="shadow rounded-4 overflow-hidden mb-3" style="min-height:450px;">
+                    <div class="shadow rounded-4 overflow-hidden flex-grow-1 mb-3" style="min-height:350px;">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3819.123456789!2d96.13000!3d16.82xxxx!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30c1xxxxxxxxxxxx%3A0xyyyyyyyyyyyyy!2s575B%20Pyay%20Rd%2C%20Yangon%2C%20Myanmar!5e0!3m2!1sen!2smm!4vXXXXXXXXXXXXXX"
                             width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                    <div class=" row g-3">
+                        <div class="col-md-6">
+                            <div
+                                class="p-3 bg-white shadow-sm rounded-4 d-flex align-items-center gap-3 border-start border-success border-4">
+                                <div class="icon-box bg-success bg-opacity-10 text-success p-2 rounded-3">
+                                    <i class="bi bi-envelope-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Email Us</small>
+                                    <a href="mailto:supportedu@gmail.com"
+                                        class="text-decoration-none text-dark fw-bold">supportedu@gmail.com</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div
+                                class="p-3 bg-white shadow-sm rounded-4 d-flex align-items-center gap-3 border-start border-success border-4">
+                                <div class="icon-box bg-success bg-opacity-10 text-success p-2 rounded-3">
+                                    <i class="bi bi-telephone-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Call Us</small>
+                                    <a href="tel:09973829157"
+                                        class="text-decoration-none text-dark fw-bold">09973829157</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

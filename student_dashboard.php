@@ -8,8 +8,8 @@ require_once __DIR__ . '/backend/config/db.php';
 $database = new Database();
 $db = $database->getConnection();
 
-// Fetch user data
-$stmt = $db->prepare("SELECT name, profile_image, force_password_change, force_document_upload FROM softedu_users WHERE id = ?");
+// Fetch user data and onboarding flags from students table
+$stmt = $db->prepare("SELECT u.name, u.profile_image, IFNULL(s.force_password_change,0) AS force_password_change, IFNULL(s.force_document_upload,0) AS force_document_upload FROM softedu_users u LEFT JOIN softedu_students s ON s.user_id = u.id WHERE u.id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -22,15 +22,6 @@ if ($needPassword || $needDocuments) {
     header('Location: student_onboarding.php');
     exit;
 }
-
-require_once __DIR__ . '/backend/config/db.php';
-$database = new Database();
-$db = $database->getConnection();
-
-// Fetch user data
-$stmt = $db->prepare("SELECT name, profile_image FROM softedu_users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Get dynamic stats from database
 $courseCount = 0;
@@ -80,6 +71,7 @@ $page = $_GET['page'] ?? 'courses';
             top: 80px;
             /* Remove width: 100%; */
         }
+
         @media (max-width: 991.98px) {
             .sidebar {
                 position: static;
@@ -1025,11 +1017,9 @@ $page = $_GET['page'] ?? 'courses';
                 try {
                     const response = await fetch('backend/user/toggle_material_status.php', {
                         method: 'POST',
+                        credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            material_id: materialId,
-                            student_id: <?= $_SESSION['user_id'] ?>
-                        })
+                        body: JSON.stringify({ material_id: materialId })
                     });
 
                     const result = await response.json();

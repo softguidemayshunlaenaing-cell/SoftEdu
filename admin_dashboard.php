@@ -191,12 +191,12 @@ if (!isset($user)) {
                                 <?php endwhile; ?>
                                 <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
                                     <tr class="empty-row">
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
                                     </tr>
                                 <?php endfor; ?>
                             </tbody>
@@ -416,7 +416,7 @@ if (!isset($user)) {
                     <h2 class="mb-4">Submissions: <?= htmlspecialchars($assignment['title']) ?></h2>
                     <p><strong>Course:</strong> <?= htmlspecialchars($assignment['course_title']) ?></p>
                     <p><strong>Due Date:</strong> <?= date('M j, Y', strtotime($assignment['due_date'])) ?></p>
-                    <a href="?page=assignments" class="btn btn-secondary mb-3">ↁEBack to Assignments</a>
+                    <a href="?page=assignments" class="btn btn-secondary mb-3">← Back to Assignments</a>
                     <div class="table-responsive table-fixed-rows">
                         <table class="table table-hover">
                             <thead>
@@ -526,7 +526,7 @@ if (!isset($user)) {
                                 while ($c = $courseStmt->fetch(PDO::FETCH_ASSOC)):
                                     ?>
                                     <option value="<?= $c['id'] ?>" <?= (($_GET['course_id'] ?? '') == $c['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($c['title']) ?>
+                                        <?php echo htmlspecialchars($c['title']); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
@@ -599,12 +599,12 @@ if (!isset($user)) {
                                 <?php endwhile; ?>
                                 <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
                                     <tr class="empty-row">
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
                                     </tr>
                                 <?php endfor; ?>
                             </tbody>
@@ -725,7 +725,7 @@ if (!isset($user)) {
                                 $totalRows = (int) $countStmt->fetchColumn();
                                 $totalPages = max(1, (int) ceil($totalRows / $perPage));
 
-                                $sql .= " ORDER BY created_at DESC LIMIT $perPage OFFSET $offset";
+                                $sql .= " ORDER BY created_at ASC LIMIT $perPage OFFSET $offset";
                                 $stmt = $db->prepare($sql);
                                 $stmt->execute($params);
                                 $rowCount = 0;
@@ -744,19 +744,23 @@ if (!isset($user)) {
                                         <td><span class="badge bg-secondary"><?= ucfirst($userRow['role']) ?></span></td>
                                         <td><?= date('M j, Y', strtotime($userRow['created_at'])) ?></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary view-docs-btn"
-                                                data-user-id="<?= $userRow['id'] ?>">View Docs</button>
+                                            <?php if (($userRow['role'] ?? '') === 'student'): ?>
+                                                <button class="btn btn-sm btn-outline-primary view-docs-btn"
+                                                    data-user-id="<?= $userRow['id'] ?>">View Docs</button>
+                                            <?php else: ?>
+                                                <span class="text-muted small">—</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
                                 <?php for ($i = $rowCount; $i < $perPage; $i++): ?>
                                     <tr class="empty-row">
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
-                                        <td>&nbsp;</td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
+                                        <td class="empty-cell"></td>
                                     </tr>
                                 <?php endfor; ?>
                             </tbody>
@@ -1038,13 +1042,60 @@ document.getElementById('editAssignmentForm')?.addEventListener('submit', async 
                     modal.show();
 
                     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-                        // ✁ECORRECT jsPDF ACCESS
-                        if (typeof window.jsPDF !== 'function') {
-                            alert('PDF library failed to load. Please refresh the page.');
+                        // Helper to detect or load jsPDF and return constructor
+                        async function getJsPDFCtor() {
+                            const checkGlobals = () => {
+                                if (typeof window.jsPDF === 'function') return window.jsPDF;
+                                if (window.jspdf && typeof window.jspdf.jsPDF === 'function') return window.jspdf.jsPDF;
+                                return null;
+                            };
+
+                            let ctor = checkGlobals();
+                            if (ctor) return ctor;
+
+                            const urls = [
+                                'https://unpkg.com/jspdf@2.5.1/dist/jspdf.legacy.min.js',
+                                'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.legacy.min.js',
+                                'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+                            ];
+
+                            for (const url of urls) {
+                                try {
+                                    // Skip adding if already attempted
+                                    if (!document.querySelector(`script[src="${url}"]`)) {
+                                        await new Promise((resolve, reject) => {
+                                            const s = document.createElement('script');
+                                            s.src = url;
+                                            s.async = true;
+                                            s.onload = resolve;
+                                            s.onerror = () => reject(new Error('Failed to load ' + url));
+                                            document.head.appendChild(s);
+                                        });
+                                    }
+                                    // Wait briefly for UMD to initialize
+                                    await new Promise(r => setTimeout(r, 120));
+                                    ctor = checkGlobals();
+                                    if (ctor) return ctor;
+                                } catch (err) {
+                                    console.warn('jsPDF load failed for', url, err);
+                                    // try next URL
+                                }
+                            }
+
+                            throw new Error('jsPDF not available');
+                        }
+
+                        let jsPDFCtor;
+                        try {
+                            jsPDFCtor = await getJsPDFCtor();
+                        } catch (err) {
+                            console.error('PDF init error:', err);
+                            alert('PDF library failed to load. See console for details.');
                             return;
                         }
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        const docs = await fetch(`backend/user/get_user_docs.php?user_id=${userId}`).then(r => r.json());
+
+                        const pdf = new jsPDFCtor('p', 'mm', 'a4');
+                        const docsList = await fetch(`backend/user/get_user_docs.php?user_id=${userId}`).then(r => r.json());
                         if (!docs || docs.length === 0) {
                             alert('No documents to download.');
                             return;

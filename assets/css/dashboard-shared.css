@@ -46,9 +46,9 @@ body {
 
 .sidebar {
     background-color: var(--surface);
-    height: calc(100vh - 56px);
-    position: sticky;
-    top: 56px;
+    /* Make sidebar participate in normal document flow so it scrolls with content */
+    position: static;
+    height: auto;
     border-right: 1px solid var(--border-color);
     padding: 20px;
 }
@@ -145,16 +145,27 @@ body {
 .pagination-wrap {
     display: flex;
     justify-content: flex-end;
-    margin-top: 1rem;
-    min-height: 48px;
+    margin-top: 0.5rem;
+    min-height: 32px;
 }
 
 .table-fixed-rows {
-    min-height: 600px;
+    min-height: 420px;
 }
 
 .empty-row td {
     height: 48px;
+}
+
+/* Hide placeholder empty cells' content and borders while preserving row height */
+.empty-row td.empty-cell,
+.empty-cell {
+    background: transparent !important;
+    color: transparent !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+    padding: 0 !important;
+    min-height: 48px;
 }
 
 @media (max-width: 576px) {

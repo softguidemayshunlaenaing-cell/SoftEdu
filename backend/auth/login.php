@@ -20,9 +20,12 @@ $database = new Database();
 $db = $database->getConnection();
 
 $stmt = $db->prepare("
-    SELECT id, name, email, password, role, profile_image, force_password_change
-    FROM softedu_users
-    WHERE email = ?
+       SELECT u.id, u.name, u.email, u.password, u.role, u.profile_image,
+            IFNULL(s.force_password_change, 0) AS force_password_change,
+            IFNULL(s.force_document_upload, 0) AS force_document_upload
+       FROM softedu_users u
+       LEFT JOIN softedu_students s ON s.user_id = u.id
+       WHERE u.email = ?
 ");
 $stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);

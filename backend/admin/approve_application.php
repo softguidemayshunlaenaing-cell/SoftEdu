@@ -66,12 +66,17 @@ try {
         $plainPassword = 'softguide.123';
         $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
 
-        // Step 4: Insert new user
+        // Step 4: Insert new user (onboarding flags moved to softedu_students)
         $stmt = $db->prepare("
-            INSERT INTO softedu_users (name, email, password, role, force_password_change)
-            VALUES (?, ?, ?, 'student', 1)
-        ");
+               INSERT INTO softedu_users (name, email, password, role)
+               VALUES (?, ?, ?, 'student')
+           ");
         $stmt->execute([$name, $generated_email, $hashedPassword]);
+
+        // Step 5: Create student record linking to the application so onboarding flags and documents are stored there
+        $newUserId = (int) $db->lastInsertId();
+        $stmt = $db->prepare("INSERT INTO softedu_students (user_id, application_id) VALUES (?, ?)");
+        $stmt->execute([$newUserId, $id]);
 
         // Step 5: Send approval email
         $toEmail = $app['email'];

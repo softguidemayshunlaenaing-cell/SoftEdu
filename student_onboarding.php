@@ -9,8 +9,8 @@ require_once './backend/config/db.php';
 $database = new Database();
 $db = $database->getConnection();
 
-// Fetch user info
-$stmt = $db->prepare("SELECT * FROM softedu_users WHERE id = ?");
+// Fetch user info and onboarding flags from students table
+$stmt = $db->prepare("SELECT u.*, IFNULL(s.force_password_change,0) AS force_password_change, IFNULL(s.force_document_upload,0) AS force_document_upload FROM softedu_users u LEFT JOIN softedu_students s ON s.user_id = u.id WHERE u.id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$user)
